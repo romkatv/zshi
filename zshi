@@ -17,14 +17,14 @@ fi
   {
     tmp=$(mktemp -d ${TMPDIR:-/tmp}/zsh.XXXXXXXXXX) || return
     local rc
-    for rc in .zshenv .zlogin .zshrc .zprofile; do
+    for rc in .zshenv .zprofile .zshrc .zlogin; do
       >$tmp/$rc <<<'{
   ZDOTDIR=$_zshi_zdotdir
   if [[ -f $ZDOTDIR/'$rc' && -r $ZDOTDIR/'$rc' ]]; then
     source -- "$ZDOTDIR"/'$rc'
   fi
 } always {
-  if [[ -o no_rcs || -o login && '$rc' == .zprofile || -o no_login && '$rc' == .zshrc ]]; then
+  if [[ -o no_rcs || -o login && '$rc' == .zlogin || -o no_login && '$rc' == .zshrc ]]; then
     unset _zshi_rcs _zshi_zdotdir
     command rm -rf -- '${(q)tmp}'
     source -- '${(q)init}'
