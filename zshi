@@ -21,16 +21,16 @@ fi
       >$tmp/$rc <<<'{
   ZDOTDIR=$_zshi_zdotdir
   if [[ -f $ZDOTDIR/'$rc' && -r $ZDOTDIR/'$rc' ]]; then
-    source -- "$ZDOTDIR"/'$rc'
+    "builtin" "source" "--" "$ZDOTDIR"/'$rc'
   fi
 } always {
-  if [[ -o no_rcs ||
-        -o login && '$rc' == .zlogin ||
-        -o no_login && '$rc' == .zshrc ||
-        -o no_login && -o no_interactive && '$rc' == .zshenv ]]; then
-    unset _zshi_rcs _zshi_zdotdir
-    command rm -rf -- '${(q)tmp}'
-    source -- '${(q)init}'
+  if [[ -o "no_rcs" ||
+        -o "login" && '$rc' == ".zlogin" ||
+        -o "no_login" && '$rc' == ".zshrc" ||
+        -o "no_login" && -o "no_interactive" && '$rc' == ".zshenv" ]]; then
+    "builtin" "unset" "_zshi_rcs" "_zshi_zdotdir"
+    "builtin" "command" "rm" "-rf" "--" '${(q)tmp}'
+    "builtin" "source" "--" '${(q)init}'
   else
     _zshi_zdotdir=${ZDOTDIR:-~}
     ZDOTDIR='${(q)tmp}'
@@ -39,6 +39,6 @@ fi
     done
     _zshi_zdotdir=${ZDOTDIR:-~} ZDOTDIR=$tmp zsh "$@"
   } always {
-    [[ -n $tmp ]] && rm -rf -- $tmp
+    [[ -e $tmp ]] && rm -rf -- $tmp
   }
 } "$@"
