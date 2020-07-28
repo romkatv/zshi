@@ -1,0 +1,41 @@
+#!/usr/bin/env zsh
+
+emulate -L zsh -o no_unset
+
+if (( ARGC == 0 )); then
+  print -ru2 -- 'usage: zshi <init-file> [--] [zsh-flags]
+The same as plain `zsh [zsh-flags]` except that <init-file> gets sourced
+after all startup files.'
+  return 1
+fi
+
+() {
+  local init=$1
+  shift
+  [[ ${1-} == -- ]] && shift
+  local tmp
+  {
+    tmp=$(mktemp -d ${TMPDIR:-/tmp}/zsh.XXXXXXXXXX) || return
+    local rc
+    for rc in .zshenv .zlogin .zshrc .zprofile; do
+      >$tmp/$rc <<<'{
+  ZDOTDIR=$_zshi_zdotdir
+  if [[ -f $ZDOTDIR/'$rc' && -r $ZDOTDIR/'$rc' ]]; then
+    source -- "$ZDOTDIR"/'$rc'
+  fi
+} always {
+  if [[ -o no_rcs || -o login && '$rc' == .zprofile || -o no_login && '$rc' == .zshrc ]]; then
+    unset _zshi_rcs _zshi_zdotdir
+    command rm -rf -- '${(q)tmp}'
+    source -- '${(q)init}'
+  else
+    _zshi_zdotdir=${ZDOTDIR:-~}
+    ZDOTDIR='${(q)tmp}'
+  fi
+}' || return
+    done
+    _zshi_zdotdir=${ZDOTDIR:-~} ZDOTDIR=$tmp zsh "$@"
+  } always {
+    [[ -n $tmp ]] && rm -rf -- $tmp
+  }
+} "$@"
