@@ -10,7 +10,7 @@ after all startup files.'
 fi
 
 () {
-  local init=$1
+  local init=${1:a}
   shift
   [[ ${1-} == -- ]] && shift
   local tmp
