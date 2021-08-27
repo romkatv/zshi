@@ -1,4 +1,5 @@
-Usage: `zshi <init-file> [zsh-flag]...`
+Usage: `zshi <init-command> [zsh-flag]...`
 
 The same as plain `zsh [zsh-flag]...` except that an additional
-`<init-file>` gets sourced after all standard Zsh startup files.
+`<init-command>` gets executed after all standard Zsh startup files
+are sourced.
